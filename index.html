@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>非凡网 - 即将上线</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #111111;
+            font-family: "Microsoft YaHei", sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            text-shadow: 0 0 15px rgba(14, 255, 105, 0.7);
+            letter-spacing: 5px;
+            font-weight: bold;
+            -webkit-text-fill-color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+                         0 0 30px rgba(14, 255, 105, 0.3);
+        }
+
+        .coming-soon {
+            color: rgba(14, 255, 105, 0.8);
+            font-size: 1.5em;
+            font-weight: bold;
+            animation: glow 2s infinite;
+            letter-spacing: 2px;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        @keyframes glow {
+            0% { 
+                opacity: 1;
+                text-shadow: 0 0 10px rgba(14, 255, 105, 0.3);
+            }
+            50% { 
+                opacity: 0.8;
+                text-shadow: 0 0 20px rgba(14, 255, 105, 0.5);
+            }
+            100% { 
+                opacity: 1;
+                text-shadow: 0 0 10px rgba(14, 255, 105, 0.3);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="triangleCanvas"></canvas>
+    <div class="container">
+        <h1>非凡网</h1>
+        <div class="coming-soon">网站建设中，近期即将上线</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('triangleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Triangle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.size = Math.random() * 20 + 10;
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.angle = Math.random() * 360;
+                this.rotationSpeed = (Math.random() - 0.5) * 2;
+                this.moveSpeed = Math.random() * 0.5 + 0.2;
+                this.opacity = Math.random() * 0.5 + 0.3;
+                
+                // 使用指定的绿色
+                this.color = `rgba(14, 255, 105, ${this.opacity})`;
+            }
+
+            update() {
+                this.y -= this.moveSpeed;
+                this.angle += this.rotationSpeed;
+
+                if (this.y < -this.size) {
+                    this.y = canvas.height + this.size;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle * Math.PI / 180);
+                
+                ctx.beginPath();
+                ctx.moveTo(-this.size/2, this.size/2);
+                ctx.lineTo(this.size/2, this.size/2);
+                ctx.lineTo(0, -this.size/2);
+                ctx.closePath();
+
+                // 设置描边样式
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = 2;
+                
+                // 添加发光效果
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 15;
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+        }
+
+        const triangles = Array.from({length: 40}, () => new Triangle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            triangles.forEach(triangle => {
+                triangle.update();
+                triangle.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html> 
